@@ -1,0 +1,16 @@
+{
+  "name": "BotCast",
+  "version": "0.0.1",
+  "repository": "alx/botcast",
+  "author": "Alexandre Girard <git@alexgirard.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "moment": "^2.18.1",
+    "node-env-file": "^0.1.8",
+    "node-telegram-bot-api": "^0.27.1",
+    "slack": "^8.3.1"
+  }
+}

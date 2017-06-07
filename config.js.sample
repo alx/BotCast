@@ -1,0 +1,43 @@
+var config = {};
+
+config.owner = 'YOUR_TELEGRAM_USERNAME';
+
+config.backup_file = 'backup.csv';
+
+config.connectors = [
+  {
+    text: 'channel1_name',
+    callback_data: 'broadcast_channel1',
+    broadcast_method: 'telegram',
+    chat_id: channel1_group_id_use_/get_id_to_fetch,
+    row: 0,
+  },
+  {
+    text: 'channel2_name',
+    callback_data: 'broadcast_channel2',
+    broadcast_method: 'telegram',
+    chat_id: channel2_group_id_use_/get_id_to_fetch,
+    row: 0,
+  },
+  {
+    text: 'channel3_name',
+    callback_data: 'broadcast_channel3',
+    broadcast_method: 'telegram',
+    chat_id: channel3_group_id_use_/get_id_to_fetch,
+    row: 1,
+  },
+  {
+    text: 'tag: white',
+    callback_data: 'tag_white',
+    broadcast_method: null,
+    row: 2,
+  },
+  {
+    text: 'tag: black',
+    callback_data: 'tag_black',
+    broadcast_method: null,
+    row: 2,
+  },
+]
+
+module.exports = config;
