@@ -83,7 +83,7 @@ The bot will answer with the channel `chat_id` and you can fill this information
 TELEGRAM_TOKEN=@BotFather_given_token
 ```
 
-1. Edit `config.js` *owner* with your Telegram username
+3. Edit `config.js` *owner* with your Telegram username
 
 ## Start the bot
 
@@ -106,5 +106,5 @@ You can now start the bot with this command in **BotCast** root path: `yarn star
 }
 ```
 
-4. You must restart the bot process
+5. You must restart the bot process
 
