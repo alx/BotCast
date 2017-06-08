@@ -74,7 +74,7 @@ telegram_bot.on('callback_query', function onCallbackQuery(callbackQuery) {
       });
 
       discord_bot.on('ready', function() {
-        discord_bot2.sendMessage({
+        discord_bot.sendMessage({
           to: connector.channel_id,
           message: text,
         });
