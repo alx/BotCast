@@ -3,7 +3,7 @@ const moment = require('moment');
 const fs = require('fs');
 
 const TelegramBot = require('node-telegram-bot-api');
-const slack = require('slack')
+const Slack = require('node-slack');
 
 const env = require('node-env-file');
 env(__dirname + '/.env');
@@ -13,11 +13,6 @@ if(!process.env.TELEGRAM_TOKEN) {
   return null;
 }
 const telegram_bot = new TelegramBot(process.env.TELEGRAM_TOKEN, {polling: true});
-
-if(process.env.SLACK_TOKEN) {
-  const slack_token = process.env.SLACK_TOKEN;
-  const slack_bot = slack.rtm.client();
-}
 
 // helper to fetch group chat id to fill config.js
 telegram_bot.onText(/\/get_id/, function getId(msg) {
@@ -63,20 +58,13 @@ telegram_bot.on('callback_query', function onCallbackQuery(callbackQuery) {
     case 'telegram':
       telegram_bot.sendMessage(connector.chat_id, text);
       break;
-    case 'broadcast_potpotbot':
-      if(slack_bot) {
-        slack_bot.message({
-          token: slack_token,
-          channel: '#general',
-          text: text
-        });
-        slack_bot.hello(message=> {
-          console.log(`Got a message: ${message}`)
-          slack_bot.close()
-        })
-
-        slack_bot.listen({token: slack_token})
-      }
+    case 'slack':
+      const slack = new Slack(connector.web_hook);
+      slack.send({
+        text: text,
+        channel: connector.channel,
+        username: connector.bot_name
+      });
       break;
   }
 
