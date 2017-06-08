@@ -4,6 +4,7 @@ const fs = require('fs');
 
 const TelegramBot = require('node-telegram-bot-api');
 const Slack = require('node-slack');
+const Discord = require('discord.io');
 
 const env = require('node-env-file');
 env(__dirname + '/.env');
@@ -64,6 +65,19 @@ telegram_bot.on('callback_query', function onCallbackQuery(callbackQuery) {
         text: text,
         channel: connector.channel,
         username: connector.bot_name
+      });
+      break;
+    case 'discord':
+      const discord_bot = new Discord.Client({
+        token: connector.token,
+        autorun: true
+      });
+
+      discord_bot.on('ready', function() {
+        discord_bot2.sendMessage({
+          to: connector.channel_id,
+          message: text,
+        });
       });
       break;
   }

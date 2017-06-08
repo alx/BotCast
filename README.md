@@ -126,3 +126,22 @@ You can now start the bot with this command in **BotCast** root path: `yarn star
 ```
 
 3. You must restart the bot process
+
+## Add Discord broadcast channel
+
+1. Create a bot with access to your Discord server, and get the token: [Creating a discord bot & getting a token](https://github.com/reactiflux/discord-irc/wiki/Creating-a-discord-bot-&-getting-a-token)
+2. Get the `channel_id` of the channel you want to broadcast to in the url of your web browser when you are connecting to this channel: https://discordapp.com/channels/1234567890
+3. Fill the `config.js` connectors section with a new connector:
+
+```
+{
+  text: 'my favorite channel',
+  callback_data: 'broadcast_to_favorite_channel',
+  broadcast_method: 'discord',
+  token: 'YOUR_BOT_TOKEN',
+  channel_id: '1234567890',
+  row: 0
+}
+```
+
+4. You must restart the bot process
