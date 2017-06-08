@@ -1,5 +1,9 @@
 # BotCast - Telegram Broadcasting Bot
 
+* [Setup](#setup)
+* [Configuration](#configuration)
+* [Running](#running)
+
  ![Screenshot](screenshot.png)
 
 **BotCast** is a Telegram bot that can be use to broadcast an input in various channels.
@@ -12,17 +16,12 @@ It reduces multiple copy/paste in a simple inline keyboard.
 
 It'll also save a csv file containing the history of the interaction with this bot.
 
+
 ## Setup
 
 ```
 yarn install
 cp config.js.sample config.js
-```
-
-You need to configure the bot before to run it.
-
-```
-yarn start
 ```
 
 ## Configuration
@@ -65,3 +64,47 @@ If you need to configure a Telegram `broadcast_method`, you will need the `chat_
 To get this id, invite your bot in the selected channel, then send this comment in the channel: `/get_id`
 
 The bot will answer with the channel `chat_id` and you can fill this information in your `config.js` file.
+
+# Running
+
+## Create your bot on Telegram
+
+1. Add `@BotFather` in your Telegram contact list
+2. Create a new bot with command: `/newbot`
+3. Give it a *name* and an *username*
+4. `@BotFather` will give you a token to access the HTTP API
+
+## Fill config
+
+1. Create a `.env` file at the root of your **BotCast** code
+2. Fill it with the previous token like this:
+
+```
+TELEGRAM_TOKEN=@BotFather_given_token
+```
+
+1. Edit `config.js` *owner* with your Telegram username
+
+## Start the bot
+
+You can now start the bot with this command in **BotCast** root path: `yarn start`
+
+## Add Telegram broadcast channel
+
+1. Invite the bot to a channel you'd like to broadcast to
+2. When the bot is added to this channel, type this command inside the channel: `/get_id`
+3. The bot will answer you with an integer, it's the *chat_id* of this channel
+4. Fill the `config.js` connectors section with a new connector:
+
+```
+{
+  text: 'my favorite channel',
+  callback_data: 'broadcast_to_favorite_channel',
+  broadcast_method: 'telegram',
+  chat_id: replace_with_correct_chat_id,
+  row: 0
+}
+```
+
+4. You must restart the bot process
+
