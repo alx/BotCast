@@ -108,3 +108,21 @@ You can now start the bot with this command in **BotCast** root path: `yarn star
 
 5. You must restart the bot process
 
+## Add Slack broadcast channel
+
+1. Create an incoming webhook for the channel you want to broadcast to: [incoming webhook integration](https://my.slack.com/services/new/incoming-webhook/)
+2. Fill the `config.js` connectors section with a new connector:
+
+```
+{
+  text: 'my favorite channel',
+  callback_data: 'broadcast_to_favorite_channel',
+  broadcast_method: 'slack',
+  web_hook: ' https://hooks.slack.com/services/YOUR_CUSTOM_WEBHOOK_URL',
+  channel: '#channel_where_to_broadcast_to',
+  bot_name: 'bot username',
+  row: 0
+}
+```
+
+3. You must restart the bot process
