@@ -2,7 +2,15 @@ var config = {};
 
 config.owner = 'YOUR_TELEGRAM_USERNAME';
 
-config.backup_file = 'backup.csv';
+config.exports = {
+  submit: [
+    {method: 'csv', path: 'backup.csv'}
+  ],
+  broadcast: [
+    {method: 'csv', path: 'backup.csv'}
+  ]
+}
+
 
 config.connectors = [
   {

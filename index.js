@@ -29,7 +29,20 @@ telegram_bot.on('message', (msg) => {
 
   const chatId = msg.chat.id;
 
-  fs.appendFileSync(config.backup_file, moment().unix() + ',submitted,' + msg.text + '\n');
+  if(config.exports && config.exports.submit && config.exports.submit.length > 0) {
+
+    config.exports.submit.forEach( export => {
+
+      switch(export.method) {
+        case 'csv':
+          const content = moment().unix() + ',submitted,' + msg.text + '\n';
+          fs.appendFileSync(export.path, content);
+          break;
+      };
+
+    });
+
+  }
 
   const opts = {
     reply_to_message_id: msg.message_id,
@@ -49,7 +62,20 @@ telegram_bot.on('callback_query', function onCallbackQuery(callbackQuery) {
   const msg = callbackQuery.message;
   const text = msg.reply_to_message.text;
 
-  fs.appendFileSync(config.backup_file, moment().unix() + ',' + action + ',' + text + '\n');
+  if(config.exports && config.exports.broadcast && config.exports.broadcast.length > 0) {
+
+    config.exports.broadcast.forEach( export => {
+
+      switch(export.method) {
+        case 'csv':
+          const content = moment().unix() + ',' + action + ',' + msg.text + '\n';
+          fs.appendFileSync(export.path, content);
+          break;
+      };
+
+    });
+
+  }
 
   const connector = config.connectors.find(connector => {
     return connector.callback_data == action;
