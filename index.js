@@ -108,4 +108,6 @@ telegram_bot.on('callback_query', function onCallbackQuery(callbackQuery) {
       break;
   }
 
+  telegram_bot.answerCallbackQuery(callbackQuery.id);
+
 });
