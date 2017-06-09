@@ -58,11 +58,14 @@ telegram_bot.on('message', (msg) => {
               size: 1,
               x: Math.random(),
               y: Math.random(),
-              actions: [{type: 'submitted', timestamp: moment().unix()}],
+              metadata: {
+                category: 'action',
+                actions: [{type: 'submitted', timestamp: moment().unix()}],
+              }
             };
             network.nodes.push(text_node);
           } else {
-            text_node.actions.push({type: 'submitted', timestamp: moment().unix()});
+            text_node.metadata.actions.push({type: 'submitted', timestamp: moment().unix()});
           }
 
           fs.writeFileSync(output.path, JSON.stringify(network, null, 2));
@@ -119,11 +122,14 @@ telegram_bot.on('callback_query', function onCallbackQuery(callbackQuery) {
               size: 1,
               x: Math.random(),
               y: Math.random(),
-              actions: [{type: action, timestamp: moment().unix()}],
+              metadata: {
+                category: 'text',
+                actions: [{type: action, timestamp: moment().unix()}],
+              }
             };
             network.nodes.push(text_node)
           } else {
-            text_node.actions.push({type: action, timestamp: moment().unix()});
+            text_node.metadata.actions.push({type: action, timestamp: moment().unix()});
           }
 
           let broadcast_node = network.nodes.find(node => node.label == action);
@@ -135,11 +141,14 @@ telegram_bot.on('callback_query', function onCallbackQuery(callbackQuery) {
               x: Math.random(),
               y: Math.random(),
               size: 1,
-              actions: [{type: action, timestamp: moment().unix()}],
+              metadata: {
+                category: 'action',
+                actions: [{type: action, timestamp: moment().unix()}],
+              }
             };
             network.nodes.push(broadcast_node)
           } else {
-            broadcast_node.actions.push({type: action, timestamp: moment().unix()});
+            broadcast_node.metadata.actions.push({type: action, timestamp: moment().unix()});
           }
 
           if(!network.edges)
