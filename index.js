@@ -31,12 +31,41 @@ telegram_bot.on('message', (msg) => {
 
   if(config.exports && config.exports.submit && config.exports.submit.length > 0) {
 
-    config.exports.submit.forEach( export => {
+    config.exports.submit.forEach( output => {
 
-      switch(export.method) {
+      switch(output.method) {
         case 'csv':
-          const content = moment().unix() + ',submitted,' + msg.text + '\n';
-          fs.appendFileSync(export.path, content);
+          const content = moment().unix() + ',submitted,' + msg.text.replace(/(\r\n|\n|\r)/gm, ' ') + '\n';
+          fs.appendFileSync(output.path, content);
+          break;
+
+        case 'network_json':
+
+          let network = {};
+          if(fs.existsSync(output.path)) {
+            network = JSON.parse(fs.readFileSync(output.path, 'utf8'));
+          }
+
+          if(!network.nodes)
+            network.nodes = [];
+
+          let text_node = network.nodes.find(node => node.label == msg.text);
+
+          if(!text_node) {
+            text_node = {
+              id: network.nodes.length,
+              label: msg.text,
+              size: 1,
+              x: Math.random(),
+              y: Math.random(),
+              actions: [{type: 'submitted', timestamp: moment().unix()}],
+            };
+            network.nodes.push(text_node);
+          } else {
+            text_node.actions.push({type: 'submitted', timestamp: moment().unix()});
+          }
+
+          fs.writeFileSync(output.path, JSON.stringify(network, null, 2));
           break;
       };
 
@@ -64,12 +93,75 @@ telegram_bot.on('callback_query', function onCallbackQuery(callbackQuery) {
 
   if(config.exports && config.exports.broadcast && config.exports.broadcast.length > 0) {
 
-    config.exports.broadcast.forEach( export => {
+    config.exports.broadcast.forEach( output => {
 
-      switch(export.method) {
+      switch(output.method) {
         case 'csv':
-          const content = moment().unix() + ',' + action + ',' + msg.text + '\n';
-          fs.appendFileSync(export.path, content);
+          const content = moment().unix() + ',' + action + ',' + text.replace(/(\r\n|\n|\r)/gm, ' ') + '\n';
+          fs.appendFileSync(output.path, content);
+          break;
+        case 'network_json':
+
+          let network = {};
+          if(fs.existsSync(output.path)) {
+            network = JSON.parse(fs.readFileSync(output.path, 'utf8'));
+          }
+
+          if(!network.nodes)
+            network.nodes = [];
+
+          let text_node = network.nodes.find(node => node.label == text);
+
+          if(!text_node) {
+            text_node = {
+              id: network.nodes.length,
+              label: text,
+              size: 1,
+              x: Math.random(),
+              y: Math.random(),
+              actions: [{type: action, timestamp: moment().unix()}],
+            };
+            network.nodes.push(text_node)
+          } else {
+            text_node.actions.push({type: action, timestamp: moment().unix()});
+          }
+
+          let broadcast_node = network.nodes.find(node => node.label == action);
+
+          if(!broadcast_node) {
+            broadcast_node = {
+              id: network.nodes.length,
+              label: action,
+              x: Math.random(),
+              y: Math.random(),
+              size: 1,
+              actions: [{type: action, timestamp: moment().unix()}],
+            };
+            network.nodes.push(broadcast_node)
+          } else {
+            broadcast_node.actions.push({type: action, timestamp: moment().unix()});
+          }
+
+          if(!network.edges)
+            network.edges = [];
+
+          let text_broadcast_edge = network.edges.find( edge => {
+            return edge.source == text_node.id && edge.target == broadcast_node.id;
+          });
+
+          if(!text_broadcast_edge) {
+            text_broadcast_edge = {
+              id: network.edges.length,
+              source: text_node.id,
+              target: broadcast_node.id,
+              timestamps: [moment().unix()],
+            };
+            network.edges.push(text_broadcast_edge);
+          } else {
+            text_broadcast_edge.timestamps.push(moment().unix());
+          }
+
+          fs.writeFileSync(output.path, JSON.stringify(network, null, 2));
           break;
       };
 
