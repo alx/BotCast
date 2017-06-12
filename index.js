@@ -15,6 +15,15 @@ if(!process.env.TELEGRAM_TOKEN) {
 }
 const telegram_bot = new TelegramBot(process.env.TELEGRAM_TOKEN, {polling: true});
 
+telegram_bot.on('polling_error', (error) => {
+  console.log('TELEGRAM_TOKEN already connected somewhere else');
+  process.exit();
+});
+
+telegram_bot.onText(/\/register/, function getId(msg) {
+  telegram_bot.sendMessage(msg.chat.id, 'registered');
+});
+
 // helper to fetch group chat id to fill config.js
 telegram_bot.onText(/\/get_id/, function getId(msg) {
   if(msg.chat.username != config.owner)
@@ -76,18 +85,62 @@ telegram_bot.on('message', (msg) => {
 
   }
 
+  let keyboard = [];
+  const keyboard_row_count = Math.max.apply(
+    Math,
+    config.connectors.map(connector => connector.row)
+  );
+  for(let i = 0; i <= keyboard_row_count; i++) {
+    keyboard.push(config.connectors.filter(connector => connector.row == i));
+  }
+
   const opts = {
     reply_to_message_id: msg.message_id,
     reply_markup: JSON.stringify({
-      inline_keyboard: [
-        config.connectors.filter(connector => connector.row == 0),
-        config.connectors.filter(connector => connector.row == 1),
-        config.connectors.filter(connector => connector.row == 2),
-      ]
+      inline_keyboard: keyboard
     })
   };
   telegram_bot.sendMessage(msg.chat.id, 'broadcast', opts);
 });
+
+call_connector = (connector, text) => {
+
+  switch(connector.broadcast_method) {
+    case 'multi':
+      connector.connector_actions.forEach( action => {
+        const conn = config.connectors.find(conn => {
+          return conn.callback_data == action;
+        });
+        call_connector(conn, text);
+      });
+      break;
+    case 'telegram':
+      telegram_bot.sendMessage(connector.chat_id, text);
+      break;
+    case 'slack':
+      const slack = new Slack(connector.web_hook);
+      slack.send({
+        text: text,
+        channel: connector.channel,
+        username: connector.bot_name
+      });
+      break;
+    case 'discord':
+      const discord_bot = new Discord.Client({
+        token: connector.token,
+        autorun: true
+      });
+
+      discord_bot.on('ready', function() {
+        discord_bot.sendMessage({
+          to: connector.channel_id,
+          message: text,
+        });
+      });
+      break;
+  }
+
+};
 
 telegram_bot.on('callback_query', function onCallbackQuery(callbackQuery) {
   const action = callbackQuery.data;
@@ -182,32 +235,7 @@ telegram_bot.on('callback_query', function onCallbackQuery(callbackQuery) {
     return connector.callback_data == action;
   });
 
-  switch(connector.broadcast_method) {
-    case 'telegram':
-      telegram_bot.sendMessage(connector.chat_id, text);
-      break;
-    case 'slack':
-      const slack = new Slack(connector.web_hook);
-      slack.send({
-        text: text,
-        channel: connector.channel,
-        username: connector.bot_name
-      });
-      break;
-    case 'discord':
-      const discord_bot = new Discord.Client({
-        token: connector.token,
-        autorun: true
-      });
-
-      discord_bot.on('ready', function() {
-        discord_bot.sendMessage({
-          to: connector.channel_id,
-          message: text,
-        });
-      });
-      break;
-  }
+  call_connector(connector, text);
 
   telegram_bot.answerCallbackQuery(callbackQuery.id);
 
