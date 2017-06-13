@@ -5,6 +5,7 @@ const fs = require('fs');
 const TelegramBot = require('node-telegram-bot-api');
 const Slack = require('node-slack');
 const Discord = require('discord.io');
+const Twitter = require('twit');
 
 const emoji = require('node-emoji');
 
@@ -139,7 +140,6 @@ telegram_bot.on('message', (msg) => {
     keyboard.push(config.connectors
                   .filter(connector => connector.row == i)
                   .map(connector => {
-                    console.log(emoji.emojify(connector.text));
                     return {
                       text: emoji.emojify(connector.text),
                       callback_data: connector.callback_data,
@@ -191,6 +191,15 @@ call_connector = (connector, text) => {
           message: text,
         });
       });
+      break;
+    case 'twitter':
+      var twitter = new Twitter({
+        consumer_key:         connector.twitter_config.consumer_key,
+        consumer_secret:      connector.twitter_config.consumer_secret,
+        access_token:         connector.twitter_config.access_token,
+        access_token_secret:  connector.twitter_config.access_token_secret,
+      })
+      twitter.post('statuses/update', { status: text });
       break;
   }
 
