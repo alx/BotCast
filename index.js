@@ -6,6 +6,8 @@ const TelegramBot = require('node-telegram-bot-api');
 const Slack = require('node-slack');
 const Discord = require('discord.io');
 
+const emoji = require('node-emoji');
+
 const env = require('node-env-file');
 env(__dirname + '/.env');
 
@@ -134,7 +136,16 @@ telegram_bot.on('message', (msg) => {
     config.connectors.map(connector => connector.row)
   );
   for(let i = 0; i <= keyboard_row_count; i++) {
-    keyboard.push(config.connectors.filter(connector => connector.row == i));
+    keyboard.push(config.connectors
+                  .filter(connector => connector.row == i)
+                  .map(connector => {
+                    console.log(emoji.emojify(connector.text));
+                    return {
+                      text: emoji.emojify(connector.text),
+                      callback_data: connector.callback_data,
+                    };
+                  })
+                 );
   }
 
   const opts = {
