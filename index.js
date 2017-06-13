@@ -20,8 +20,42 @@ telegram_bot.on('polling_error', (error) => {
   process.exit();
 });
 
+const COMMANDS = [
+  /\/register/,
+  /\/weekly/,
+  /\/get_id/,
+];
+
 telegram_bot.onText(/\/register/, function getId(msg) {
+
+  if(msg.chat.type != 'private')
+    return null;
+
   telegram_bot.sendMessage(msg.chat.id, 'registered');
+});
+
+telegram_bot.onText(/\/weekly/, function getId(msg) {
+
+  if(msg.chat.type != 'private')
+    return null;
+
+  if(fs.existsSync('parasol.json')) {
+    network = JSON.parse(fs.readFileSync('parasol.json', 'utf8'));
+  }
+
+  content = network.nodes.filter( node => {
+    return node.metadata.actions
+      .map( action => action.type )
+      .indexOf('tag_entheogen') != -1 &&
+    /\/tag_/.test(node.label) == false
+  }).map( node => {
+    return '[' + node.label + '](' + node.label +')';
+  }).join('\n');
+
+  telegram_bot.sendMessage(msg.chat.id, content, {
+    parse_mode: 'markdown',
+    disable_web_page_preview: true,
+  });
 });
 
 // helper to fetch group chat id to fill config.js
@@ -34,6 +68,15 @@ telegram_bot.onText(/\/get_id/, function getId(msg) {
 telegram_bot.on('message', (msg) => {
 
   if(msg.chat.type != 'private' || msg.chat.username != config.owner)
+    return null;
+
+  let is_command = false;
+  COMMANDS.forEach(command => {
+    if(command.test(msg.text)) {
+      is_command = true;
+    }
+  });
+  if(is_command)
     return null;
 
   const chatId = msg.chat.id;
