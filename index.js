@@ -19,6 +19,7 @@ if(!process.env.TELEGRAM_TOKEN) {
 const telegram_bot = new TelegramBot(process.env.TELEGRAM_TOKEN, {polling: true});
 
 telegram_bot.on('polling_error', (error) => {
+  console.log(error);
   console.log('TELEGRAM_TOKEN already connected somewhere else');
   process.exit();
 });
@@ -89,6 +90,31 @@ telegram_bot.on('message', (msg) => {
     config.exports.submit.forEach( output => {
 
       switch(output.method) {
+        case 'json':
+
+          let json_content = {};
+          if(fs.existsSync(output.path)) {
+            json_content = JSON.parse(fs.readFileSync(output.path, 'utf8'));
+          }
+
+          if(!json_content.items)
+            json_content.items = [];
+
+          let item = json_content.items.find( item => {
+            return item.text == msg.text;
+          });
+
+          if(item) {
+            item.actions.push({action: 'submitted', timestamp: moment().unix()});
+          } else {
+            json_content.items.push({
+              text: msg.text,
+              actions: [{action: 'submitted', timestamp: moment().unix()}]
+            });
+          }
+
+          fs.writeFileSync(output.path, JSON.stringify(json_content, null, 4));
+          break;
         case 'csv':
           const content = moment().unix() + ',submitted,' + msg.text.replace(/(\r\n|\n|\r)/gm, ' ') + '\n';
           fs.appendFileSync(output.path, content);
@@ -215,6 +241,32 @@ telegram_bot.on('callback_query', function onCallbackQuery(callbackQuery) {
     config.exports.broadcast.forEach( output => {
 
       switch(output.method) {
+        case 'json':
+
+          let json_content = {};
+          if(fs.existsSync(output.path)) {
+            json_content = JSON.parse(fs.readFileSync(output.path, 'utf8'));
+          }
+
+          if(!json_content.items)
+            json_content.items = [];
+
+          let item = json_content.items.find( item => {
+            return item.text == text;
+          });
+
+          if(item) {
+            item.actions.push({action: action, timestamp: moment().unix()});
+          } else {
+            json_content.items.push({
+              text: text,
+              actions: [{action: action, timestamp: moment().unix()}]
+            });
+          }
+
+          fs.writeFileSync(output.path, JSON.stringify(json_content, null, 4));
+          break;
+
         case 'csv':
           const content = moment().unix() + ',' + action + ',' + text.replace(/(\r\n|\n|\r)/gm, ' ') + '\n';
           fs.appendFileSync(output.path, content);
