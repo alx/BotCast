@@ -36,6 +36,6 @@ reader.addListener('data', function(data) {
     });
   }
 
-  fs.writeFileSync('regex.json', JSON.stringify(json_content, null, 4));
+  fs.writeFileSync('backup.json', JSON.stringify(json_content, null, 4));
 });
 

@@ -4,12 +4,16 @@ config.owner = 'YOUR_TELEGRAM_USERNAME';
 
 config.exports = {
   submit: [
+    {method: 'json', path: 'backup.json'},
     {method: 'csv', path: 'backup.csv'},
     {method: 'network_json', path: 'parasol.json'}
   ],
   broadcast: [
+    {method: 'json', path: 'backup.json'},
     {method: 'csv', path: 'backup.csv'},
     {method: 'network_json', path: 'parasol.json'}
+    {method: 'feed', format: 'json', data: 'backup.json', path: 'feed.json'},
+    {method: 'feed', format: 'atom', data: 'backup.json', path: 'atom.xml'}
   ]
 }
 

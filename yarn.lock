@@ -266,6 +266,12 @@ extsprintf@1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/extsprintf/-/extsprintf-1.0.2.tgz#e1080e0658e300b06294990cc70e1502235fd550"
 
+feed@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/feed/-/feed-1.1.0.tgz#a8367ca5ed5191eb429b42732050df25f17a9966"
+  dependencies:
+    xml "^1.0.1"
+
 file-type@^3.9.0:
   version "3.9.0"
   resolved "https://registry.yarnpkg.com/file-type/-/file-type-3.9.0.tgz#257a078384d1db8087bc449d107d52a52672b9e9"
@@ -734,6 +740,10 @@ ws@^1.1.0, ws@^1.1.4:
   dependencies:
     options ">=0.0.5"
     ultron "1.0.x"
+
+xml@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/xml/-/xml-1.0.1.tgz#78ba72020029c5bc87b8a81a3cfcd74b4a2fc1e5"
 
 ya-csv@^0.10.1:
   version "0.10.1"

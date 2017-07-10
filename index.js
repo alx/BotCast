@@ -9,6 +9,8 @@ const Twitter = require('twit');
 
 const emoji = require('node-emoji');
 
+const Feed = require('feed')
+
 const env = require('node-env-file');
 env(__dirname + '/.env');
 
@@ -29,6 +31,9 @@ const COMMANDS = [
   /\/weekly/,
   /\/get_id/,
 ];
+
+var url_expression = /\b((?:[a-z][\w-]+:(?:\/{1,3}|[a-z0-9%])|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))/i;
+var url_regex = new RegExp(url_expression);
 
 telegram_bot.onText(/\/register/, function getId(msg) {
 
@@ -107,7 +112,13 @@ telegram_bot.on('message', (msg) => {
           if(item) {
             item.actions.push({action: 'submitted', timestamp: moment().unix()});
           } else {
+            const parsedUrl = url_regex.exec(msg.text);
+            let url = null;
+            if(parsedUrl && parsedUrl.length > 0)
+              url = parsedUrl[0];
+
             json_content.items.push({
+              url: url,
               text: msg.text,
               actions: [{action: 'submitted', timestamp: moment().unix()}]
             });
@@ -235,6 +246,8 @@ telegram_bot.on('callback_query', function onCallbackQuery(callbackQuery) {
   const action = callbackQuery.data;
   const msg = callbackQuery.message;
   const text = msg.reply_to_message.text;
+  let json_content = {};
+  let output_content = {};
 
   if(config.exports && config.exports.broadcast && config.exports.broadcast.length > 0) {
 
@@ -243,7 +256,6 @@ telegram_bot.on('callback_query', function onCallbackQuery(callbackQuery) {
       switch(output.method) {
         case 'json':
 
-          let json_content = {};
           if(fs.existsSync(output.path)) {
             json_content = JSON.parse(fs.readFileSync(output.path, 'utf8'));
           }
@@ -258,7 +270,14 @@ telegram_bot.on('callback_query', function onCallbackQuery(callbackQuery) {
           if(item) {
             item.actions.push({action: action, timestamp: moment().unix()});
           } else {
+
+            const parsedUrl = url_regex.exec(text);
+            let url = null;
+            if(parsedUrl && parsedUrl.length > 0)
+              url = parsedUrl[0];
+
             json_content.items.push({
+              url: url,
               text: text,
               actions: [{action: action, timestamp: moment().unix()}]
             });
@@ -268,9 +287,70 @@ telegram_bot.on('callback_query', function onCallbackQuery(callbackQuery) {
           break;
 
         case 'csv':
-          const content = moment().unix() + ',' + action + ',' + text.replace(/(\r\n|\n|\r)/gm, ' ') + '\n';
-          fs.appendFileSync(output.path, content);
+          output_content = moment().unix() + ',' + action + ',' + text.replace(/(\r\n|\n|\r)/gm, ' ') + '\n';
+          fs.appendFileSync(output.path, output_content);
           break;
+
+        case 'feed':
+
+          let feed = new Feed({
+            title: 'BotCast',
+            description: 'url streaming',
+            id: 'http://botcast.alexgirard.com/',
+            link: 'http://botcast.alexgirard.com/',
+            image: 'http://botcast.alexgirard.com/image.png',
+            favicon: 'http://botcast.alexgirard.com/favicon.ico',
+            copyright: 'All rights reserved 2017, Alexandre Girard',
+            updated: moment().toDate(),
+            generator: 'botcast',
+            feedLinks: {
+              json: 'https://botcast.alexgirard.com/feed.json',
+              atom: 'https://botcast.alexgirard.com/atom.xml',
+            },
+            author: {
+              name: 'Alexandre Girard',
+              email: 'botcast@alexgirard.com',
+              link: 'https://alexgirard.com'
+            }
+          })
+
+          if(fs.existsSync(output.data)) {
+            json_content = JSON.parse(fs.readFileSync(output.data, 'utf8'));
+          }
+
+
+          if(!json_content.items)
+            json_content.items = [];
+
+          const feed_items = json_content.items.filter( item => {
+            return item.url && item.url.length > 0;
+          }).sort( (b, a) => {
+            return a.actions[0].timestamp - b.actions[0].timestamp;
+          }).slice(0, 10);
+
+          feed_items.forEach(item => {
+            feed.addItem({
+              title: item.text,
+              id: item.url,
+              link: item.url,
+              description: item.text,
+              content: item.text,
+              date: moment.unix(item.actions[0].timestamp).toDate(),
+            })
+          });
+
+          switch(output.format) {
+            case 'json':
+              output_content = feed.json1();
+              break;
+            case 'atom':
+              output_content = feed.atom1();
+              break;
+          }
+
+          fs.writeFileSync(output.path, output_content);
+          break;
+
         case 'network_json':
 
           let network = {};
