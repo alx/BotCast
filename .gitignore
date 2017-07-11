@@ -1,6 +1,7 @@
 node_modules/
 config.js
 .env
+!website/.env
 backup.csv
 *.json
 !package.json
