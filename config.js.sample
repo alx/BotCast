@@ -12,8 +12,8 @@ config.exports = {
     {method: 'json', path: 'backup.json'},
     {method: 'csv', path: 'backup.csv'},
     {method: 'network_json', path: 'parasol.json'}
-    {method: 'feed', format: 'json', data: 'backup.json', path: 'feed.json'},
-    {method: 'feed', format: 'atom', data: 'backup.json', path: 'atom.xml'}
+    {method: 'feed', format: 'json', data: 'backup.json', path: 'website/public/feed.json'},
+    {method: 'feed', format: 'atom', data: 'backup.json', path: 'website/public/atom.xml'}
   ]
 }
 
