@@ -3,4 +3,5 @@ config.js
 .env
 backup.csv
 *.json
+!package.json
 *.xml
