@@ -322,11 +322,24 @@ telegram_bot.on('callback_query', function onCallbackQuery(callbackQuery) {
           if(!json_content.items)
             json_content.items = [];
 
-          const feed_items = json_content.items.filter( item => {
+          let feed_items = json_content.items.filter( item => {
             return item.url && item.url.length > 0;
           }).sort( (b, a) => {
             return a.actions[0].timestamp - b.actions[0].timestamp;
-          }).slice(0, 10);
+          });
+
+          if(output.action_filters && output.action_filters.length > 0) {
+
+            feed_items = feed_items.filter( item => {
+              return item.actions.map(action => action.action).some(action => {
+                return output.action_filters.indexOf(action) >= 0;
+              });
+            });
+          }
+
+          if(output.limit && output.limit > 0) {
+            feed_items = feed_items.slice(0, output.limit);
+          }
 
           feed_items.forEach(item => {
             feed.addItem({
