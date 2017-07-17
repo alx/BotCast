@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "discord.io": "^2.5.1",
-    "feed": "https://github.com/alx/feed.git#json1_extensions",
+    "feed": "https://github.com/alx/feed.git#json1_tags",
     "metaphor": "^3.8.2",
     "moment": "^2.18.1",
     "node-emoji": "^1.5.1",

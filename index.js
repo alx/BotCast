@@ -340,7 +340,7 @@ telegram_bot.on('callback_query', function onCallbackQuery(callbackQuery) {
             feed_items = feed_items.slice(0, output.limit);
           }
 
-          feed_items.forEach(item => {
+          feed_items.forEach((item, index) => {
             feed.addItem({
               title: item.text,
               id: item.url,
@@ -348,8 +348,10 @@ telegram_bot.on('callback_query', function onCallbackQuery(callbackQuery) {
               description: item.text,
               content: item.text,
               date: moment.unix(item.actions[0].timestamp).toDate(),
+              tags: item.actions.map( action => action.action )
             })
           });
+
 
           switch(output.format) {
             case 'json':

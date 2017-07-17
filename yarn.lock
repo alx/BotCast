@@ -266,15 +266,9 @@ extsprintf@1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/extsprintf/-/extsprintf-1.0.2.tgz#e1080e0658e300b06294990cc70e1502235fd550"
 
-feed@^1.1.0:
+"feed@https://github.com/alx/feed.git#json1_tags":
   version "1.1.0"
-  resolved "https://registry.yarnpkg.com/feed/-/feed-1.1.0.tgz#a8367ca5ed5191eb429b42732050df25f17a9966"
-  dependencies:
-    xml "^1.0.1"
-
-"feed@https://github.com/alx/feed.git#json1_extensions":
-  version "1.1.0"
-  resolved "https://github.com/alx/feed.git#777efdd2785439dab8b51d6628e218f0ba809be0"
+  resolved "https://github.com/alx/feed.git#ae9a0d99fb1f8f26da60004364bc9b69aa6300f9"
   dependencies:
     xml "^1.0.1"
 
