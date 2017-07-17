@@ -272,6 +272,12 @@ feed@^1.1.0:
   dependencies:
     xml "^1.0.1"
 
+"feed@https://github.com/alx/feed.git#json1_extensions":
+  version "1.1.0"
+  resolved "https://github.com/alx/feed.git#777efdd2785439dab8b51d6628e218f0ba809be0"
+  dependencies:
+    xml "^1.0.1"
+
 file-type@^3.9.0:
   version "3.9.0"
   resolved "https://registry.yarnpkg.com/file-type/-/file-type-3.9.0.tgz#257a078384d1db8087bc449d107d52a52672b9e9"
