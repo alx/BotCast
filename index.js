@@ -322,7 +322,7 @@ telegram_bot.on('callback_query', function onCallbackQuery(callbackQuery) {
             json_content.items = [];
 
           let feed_items = json_content.items.filter( item => {
-            return item.url && item.url.length > 0;
+            return item.url && item.url.length > 0 && typeof(item.actions) != 'undefined';
           }).sort( (b, a) => {
             return a.actions[0].timestamp - b.actions[0].timestamp;
           });
